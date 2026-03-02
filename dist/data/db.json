@@ -1,0 +1,31 @@
+{
+  "livres": [
+    {
+      "titre": "Le roi des Anneaux",
+      "auteur": "Charle le roi",
+      "isbn": "13",
+      "anneePublication": 2002,
+      "categorie": "Histoire",
+      "nombrePages": 330,
+      "id": "LIV-0001",
+      "disponible": true
+    },
+    {
+      "titre": "Ako",
+      "auteur": "Ange",
+      "isbn": "2",
+      "anneePublication": 2009,
+      "categorie": "Autre",
+      "nombrePages": 10,
+      "id": "LIV-0002",
+      "disponible": true
+    }
+  ],
+  "membres": [],
+  "emprunts": [],
+  "counters": {
+    "livreId": 3,
+    "membreId": 1,
+    "empruntId": 1
+  }
+}
