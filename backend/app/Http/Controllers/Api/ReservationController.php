@@ -1,7 +1,5 @@
 <?php
-
 namespace App\Http\Controllers\Api;
-
 use App\Http\Controllers\Controller;
 use App\Models\Reservation;
 use App\Models\Espace;
@@ -15,7 +13,6 @@ class ReservationController extends Controller
         $reservations = Reservation::with(['espace'])
             ->where('user_id', $request->user()->id)
             ->get();
-
         return response()->json($reservations);
     }
 
@@ -23,13 +20,10 @@ class ReservationController extends Controller
     public function adminIndex(Request $request)
     {
         $query = Reservation::with(['user', 'espace']);
-
-        // Filtre par date
         if ($request->has('date_debut') && $request->has('date_fin')) {
             $query->where('date_debut', '>=', $request->date_debut)
                   ->where('date_fin', '<=', $request->date_fin);
         }
-
         return response()->json($query->get());
     }
 
@@ -42,7 +36,6 @@ class ReservationController extends Controller
             'date_fin'   => 'required|date|after:date_debut',
         ]);
 
-        // Vérifier la disponibilité
         $conflit = Reservation::where('espace_id', $request->espace_id)
             ->where('date_debut', '<=', $request->date_fin)
             ->where('date_fin', '>=', $request->date_debut)
@@ -54,7 +47,6 @@ class ReservationController extends Controller
             ], 409);
         }
 
-        // Calculer le prix total
         $espace = Espace::findOrFail($request->espace_id);
         $debut  = \Carbon\Carbon::parse($request->date_debut);
         $fin    = \Carbon\Carbon::parse($request->date_fin);
@@ -77,12 +69,51 @@ class ReservationController extends Controller
     public function update(Request $request, $id)
     {
         $reservation = Reservation::findOrFail($id);
-
         $reservation->update($request->only([
             'date_debut', 'date_fin', 'facture_acquittee'
         ]));
-
         return response()->json($reservation->load(['user', 'espace']));
+    }
+
+    // PUT /api/reservations/{id} — modifier sa propre réservation (utilisateur)
+    public function userUpdate(Request $request, $id)
+    {
+        $reservation = Reservation::findOrFail($id);
+
+        if ($reservation->user_id !== $request->user()->id) {
+            return response()->json(['message' => 'Non autorisé'], 403);
+        }
+
+        $request->validate([
+            'date_debut' => 'required|date|after_or_equal:today',
+            'date_fin'   => 'required|date|after:date_debut',
+        ]);
+
+        $conflit = Reservation::where('espace_id', $reservation->espace_id)
+            ->where('id', '!=', $id)
+            ->where('date_debut', '<=', $request->date_fin)
+            ->where('date_fin', '>=', $request->date_debut)
+            ->exists();
+
+        if ($conflit) {
+            return response()->json([
+                'message' => 'Cet espace est déjà réservé pour ces dates'
+            ], 409);
+        }
+
+        $espace = Espace::findOrFail($reservation->espace_id);
+        $debut  = \Carbon\Carbon::parse($request->date_debut);
+        $fin    = \Carbon\Carbon::parse($request->date_fin);
+        $jours  = $debut->diffInDays($fin) + 1;
+        $prix   = $jours * $espace->tarif_journalier;
+
+        $reservation->update([
+            'date_debut' => $request->date_debut,
+            'date_fin'   => $request->date_fin,
+            'prix_total' => $prix,
+        ]);
+
+        return response()->json($reservation->load(['espace']));
     }
 
     // DELETE /api/reservations/{id} — supprimer une réservation
@@ -90,13 +121,11 @@ class ReservationController extends Controller
     {
         $reservation = Reservation::findOrFail($id);
 
-        // Un utilisateur ne peut supprimer que ses propres réservations
         if (!$request->user()->isAdmin() && $reservation->user_id !== $request->user()->id) {
             return response()->json(['message' => 'Non autorisé'], 403);
         }
 
         $reservation->delete();
-
         return response()->json(['message' => 'Réservation supprimée avec succès']);
     }
 }

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api;
 
+use Illuminate\Support\Facades\Storage;
 use App\Http\Controllers\Controller;
 use App\Models\Espace;
 use App\Models\EspacePhoto;
@@ -87,6 +88,8 @@ class EspaceController extends Controller
             'type'             => 'in:bureau,salle_de_reunion,conference',
             'tarif_journalier' => 'numeric',
             'equipements'      => 'array',
+            'photos'           => 'array',           // ✅ ajouté
+            'photos.*'         => 'image|mimes:jpeg,png,jpg,webp,avif|max:2048', // ✅ ajouté
         ]);
 
         $espace->update($request->only([
@@ -95,6 +98,17 @@ class EspaceController extends Controller
             'type',
             'tarif_journalier'
         ]));
+
+        // Ajout de nouvelles photos
+        if ($request->hasFile('photos')) {
+            foreach ($request->file('photos') as $photo) {
+                $chemin = $photo->store('espaces', 'public');
+                EspacePhoto::create([
+                    'espace_id' => $espace->id,
+                    'chemin'    => $chemin,
+                ]);
+            }
+        }
 
         // Mettre à jour les équipements
         if ($request->has('equipements')) {
@@ -108,8 +122,24 @@ class EspaceController extends Controller
     public function destroy($id)
     {
         $espace = Espace::findOrFail($id);
+
+        // Supprimer les fichiers photos du stockage
+        foreach ($espace->photos as $photo) {
+            Storage::disk('public')->delete($photo->chemin);
+        }
+
         $espace->delete();
 
         return response()->json(['message' => 'Espace supprimé avec succès']);
+    }
+
+    // DELETE /api/admin/espaces/photos/{id} — supprimer une photo (admin) 
+    public function destroyPhoto($id)
+    {
+        $photo = EspacePhoto::findOrFail($id);
+        Storage::disk('public')->delete($photo->chemin);
+        $photo->delete();
+
+        return response()->json(['message' => 'Photo supprimée avec succès']);
     }
 }
