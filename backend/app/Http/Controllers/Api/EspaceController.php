@@ -7,12 +7,21 @@ use App\Http\Controllers\Controller;
 use App\Models\Espace;
 use App\Models\EspacePhoto;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 
 class EspaceController extends Controller
 {
     // GET /api/espaces — liste tous les espaces
     public function index(Request $request)
     {
+        //ajout de cache pour la liste des espaces (1 heure)
+        if (!$request->has('date_debut') && !$request->has('type')) {
+        $espaces = Cache::remember('espaces', 3600, function () {
+            return Espace::with(['equipements', 'photos'])->paginate(10);
+        });
+        return response()->json($espaces);
+    }
+
         $query = Espace::with(['equipements', 'photos']);
 
         // Filtre par type
@@ -28,7 +37,7 @@ class EspaceController extends Controller
             });
         }
 
-        return response()->json($query->get());
+        return response()->json($query->paginate(10)); // pagination à 10 par page
     }
 
     // GET /api/espaces/{id} — détail d'un espace
@@ -121,7 +130,7 @@ class EspaceController extends Controller
     // DELETE /api/admin/espaces/{id} — supprimer un espace (admin)
     public function destroy($id)
     {
-        $espace = Espace::findOrFail($id); 
+        $espace = Espace::findOrFail($id);
 
         // Supprimer les fichiers photos du stockage
         foreach ($espace->photos as $photo) {
