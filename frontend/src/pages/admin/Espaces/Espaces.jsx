@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import Header from '../../../components/layout/Header/Header'
 import Footer from '../../../components/layout/Footer/Footer'
+import EditEspaceModal from './EditEspaceModal'
 import api from '../../../services/api'
 
 const typeBadge = {
@@ -16,6 +17,7 @@ export default function AdminEspaces() {
     const [search, setSearch] = useState('')
     const [filterType, setFilterType] = useState('')
     const [loading, setLoading] = useState(true)
+    const [selectedEspace, setSelectedEspace] = useState(null)
 
     useEffect(() => {
         fetchEspaces()
@@ -169,7 +171,7 @@ export default function AdminEspaces() {
                                         {/* Boutons */}
                                         <div className="flex gap-2">
                                             <button
-                                                onClick={() => navigate(`/admin/espaces/${espace.id}/edit`)}
+                                                onClick={() => setSelectedEspace(espace)}
                                                 className="flex-1 py-2 rounded-xl text-sm font-medium text-gray-600 border border-gray-200 hover:bg-eco-mint hover:text-gray-800 transition-all"
                                             >
                                                 Modifier
@@ -187,6 +189,17 @@ export default function AdminEspaces() {
                         </div>
                     )}
                 </div>
+
+                {selectedEspace && (
+                    <EditEspaceModal
+                        espace={selectedEspace}
+                        onClose={() => setSelectedEspace(null)}
+                        onUpdated={(updated) => {
+                            setEspaces(espaces.map(e => e.id === updated.id ? updated : e))
+                            setSelectedEspace(null)
+                        }}
+                    />
+                )}
             </main>
 
             <Footer />

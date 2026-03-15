@@ -16,6 +16,7 @@ import AdminEspaces from './pages/admin/Espaces/Espaces'
 import AdminReservations from './pages/admin/Reservations/Reservations'
 import AdminUsers from './pages/admin/Users/Users'
 import CreateAdmin from './pages/admin/Users/CreateAdmin'
+import CreateEspace from './pages/admin/Espaces/CreateEspace'
 
 
 function PrivateRoute({ children }) {
@@ -45,6 +46,7 @@ export default function App() {
 
       <Route path="/admin/dashboard" element={<AdminRoute><AdminDashboard /></AdminRoute>} />
       <Route path="/admin/espaces" element={<AdminRoute><AdminEspaces /></AdminRoute>} />
+      <Route path="/admin/espaces/create" element={<AdminRoute><CreateEspace /></AdminRoute>} />
       <Route path="/admin/reservations" element={<AdminRoute><AdminReservations /></AdminRoute>} />
       <Route path="/admin/users" element={<AdminRoute><AdminUsers /></AdminRoute>} />
       <Route path="/admin/users/create" element={<AdminRoute><CreateAdmin /></AdminRoute>} />
