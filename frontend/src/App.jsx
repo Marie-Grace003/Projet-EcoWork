@@ -17,6 +17,7 @@ import AdminReservations from './pages/admin/Reservations/Reservations'
 import AdminUsers from './pages/admin/Users/Users'
 import CreateAdmin from './pages/admin/Users/CreateAdmin'
 
+
 function PrivateRoute({ children }) {
   const { user, loading } = useAuth()
   if (loading) return <div>Chargement...</div>
@@ -47,6 +48,7 @@ export default function App() {
       <Route path="/admin/reservations" element={<AdminRoute><AdminReservations /></AdminRoute>} />
       <Route path="/admin/users" element={<AdminRoute><AdminUsers /></AdminRoute>} />
       <Route path="/admin/users/create" element={<AdminRoute><CreateAdmin /></AdminRoute>} />
+      <Route path="/admin/profil" element={<AdminRoute><Profil /></AdminRoute>} />
     </Routes>
   )
 }
