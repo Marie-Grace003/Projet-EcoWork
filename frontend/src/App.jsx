@@ -9,6 +9,7 @@ import UserDashboard from './pages/user/Dashboard/Dashboard'
 import Espaces from './pages/user/Espaces/Espaces'
 import Reservation from './pages/user/Reservation/Reservation'
 import Profil from './pages/user/Profil/Profil'
+import MesReservations from './pages/user/Reservation/MesReservations'
 
 // Pages admin
 import AdminDashboard from './pages/admin/Dashboard/Dashboard'
@@ -43,6 +44,7 @@ export default function App() {
       <Route path="/espaces" element={<PrivateRoute><Espaces /></PrivateRoute>} />
       <Route path="/reservation/:id" element={<PrivateRoute><Reservation /></PrivateRoute>} />
       <Route path="/profil" element={<PrivateRoute><Profil /></PrivateRoute>} />
+      <Route path="/reservations" element={<PrivateRoute><MesReservations /></PrivateRoute>} />
 
       <Route path="/admin/dashboard" element={<AdminRoute><AdminDashboard /></AdminRoute>} />
       <Route path="/admin/espaces" element={<AdminRoute><AdminEspaces /></AdminRoute>} />
