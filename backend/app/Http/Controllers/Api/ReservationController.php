@@ -111,6 +111,7 @@ class ReservationController extends Controller
             'date_debut' => $request->date_debut,
             'date_fin'   => $request->date_fin,
             'prix_total' => $prix,
+            'facture_acquittee' => false,
         ]);
 
         return response()->json($reservation->load(['espace']));
