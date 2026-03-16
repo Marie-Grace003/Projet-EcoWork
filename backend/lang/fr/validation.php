@@ -99,7 +99,7 @@ return [
         'array'   => 'Le tableau :attribute doit contenir au moins :min éléments.',
         'file'    => 'La taille du fichier de :attribute doit être supérieure ou égale à :min kilo-octets.',
         'numeric' => 'La valeur de :attribute doit être supérieure ou égale à :min.',
-        'string'  => 'Le texte de :attribute doit contenir au moins :min caractères.',
+        'string'  => 'Le champ :attribute doit contenir au moins :min caractères.',
     ],
     'min_digits'             => 'Le champ :attribute doit avoir au moins :min chiffres.',
     'missing'                => 'Le champ :attribute doit être manquant.',
@@ -156,4 +156,9 @@ return [
     'uppercase'              => 'Le champ :attribute doit être en majuscules.',
     'url'                    => 'Le format de l\'URL de :attribute n\'est pas valide.',
     'uuid'                   => 'Le champ :attribute doit être un UUID valide',
+
+    'attributes' => [
+        'mot_de_passe' => 'mot de passe',
+        'email' => 'email',
+    ],
 ];
